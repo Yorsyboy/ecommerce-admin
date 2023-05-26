@@ -38,5 +38,13 @@ table.basic tr td {
 }
 
 table.basic a {
-  @apply inline-flex gap-1 bg-blue-900 text-white text-sm py-1 px-2 rounded-md
+  @apply inline-flex gap-1 mr-1 bg-blue-900 text-white text-sm py-1 px-2 rounded-md
 }
+
+.btn-red {
+  @apply bg-red-900 text-white px-4 py-1 rounded-md
+}
+
+.btn-default {
+  @apply bg-gray-500 text-white px-4 py-1 rounded-md
+} 

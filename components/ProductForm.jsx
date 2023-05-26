@@ -4,9 +4,9 @@ import React, { useState } from "react";
 
 export default function ProductForm({ productInfo }) {
   const router = useRouter();
-  const [title, setTitle] = useState(productInfo.title || "");
-  const [description, setDescription] = useState(productInfo.description || "");
-  const [price, setPrice] = useState(productInfo.price || "");
+  const [title, setTitle] = useState(productInfo?.title || "");
+  const [description, setDescription] = useState(productInfo?.description || "");
+  const [price, setPrice] = useState(productInfo?.price || "");
   const [goToProducts, setGoToProducts] = useState(false);
 
   const saveProduct = async (e) => {
@@ -35,6 +35,7 @@ export default function ProductForm({ productInfo }) {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="product name"
       />
+      <label htmlFor="">Product Image</label>
       <label htmlFor="">Product Description</label>
       <textarea
         value={description}

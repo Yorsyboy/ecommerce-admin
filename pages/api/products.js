@@ -26,4 +26,11 @@ export default async function handler(req, res) {
         await Product.updateOne({ _id }, { title, description, price })
         res.status(200).json({ message: 'Product updated successfully' });
     }
+
+    if (method === 'DELETE') {
+        if (req.query?.id) {
+            await Product.deleteOne({ _id: req.query.id });
+            res.status(200).json({ message: 'Product deleted successfully' });
+        }
+    }
 }
