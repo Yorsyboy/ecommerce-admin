@@ -28,23 +28,27 @@ export default function ProductForm({ productInfo }) {
     router.push("/products");
   }
 
-  async function uploadImages(e) {
-    const files = e.target?.files;
-    if (files?.length > 0) {
-      const data = new FormData();
-
-      for (const file of files) {
-        data.append("images", file);
-      }
-      
-      await axios.post("/api/upload", data).then((res) => {
-        console.log(res.data);
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+  
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      await axios.post('/api/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
+  
+      console.log('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Error occurred during image upload:', error);
     }
-  }
+  };
+  
+  
 
   return (
-    <form onSubmit={saveProduct}>
+    <form onSubmit={saveProduct} encType="multipart/form-data">
       <label>Product Name</label>
       <input
         type="text"
@@ -72,12 +76,14 @@ export default function ProductForm({ productInfo }) {
           <div>Upload Image</div>
           <input
             type="file"
+            id="imageUpload"
+            name="image"
             accept="image/*"
-            onChange={uploadImages}
+            onChange={handleFileUpload}
             className="hidden"
           />
         </label>
-        {productInfo?.image && <div>No images for this Product </div>}
+        {!productInfo?.image && <div>No images for this Product </div>}
       </div>
       <label htmlFor="">Product Description</label>
       <textarea
