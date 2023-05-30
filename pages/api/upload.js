@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         // },
     });
     const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
-
+    
     form.parse(req, async (err, fields, files) => {
         if (err) {
             console.error(err);
