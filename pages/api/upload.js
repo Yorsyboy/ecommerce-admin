@@ -1,5 +1,6 @@
 import multiparty from 'multiparty';
 import { Storage } from '@google-cloud/storage';
+import fs from 'fs';
 
 export const config = {
     api: {
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
         // },
     });
     const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
-    
+
     form.parse(req, async (err, fields, files) => {
         if (err) {
             console.error(err);
@@ -28,14 +29,19 @@ export default async function handler(req, res) {
 
         const file = files.file[0];
         const blob = bucket.file(file.originalFilename);
-
-        try {
-            await blob.createWriteStream().end(file.buffer);
-            const imageUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-            res.status(200).send(imageUrl);
-        } catch (error) {
-            console.error(error);
-            res.status(500).end('File upload failed');
-        }
+        const stream = fs.createReadStream(file.path);
+        const options = {
+            metadata: {
+                contentType: file.headers['content-type'],
+            },
+        };
+        await new Promise((resolve, reject) => {
+            stream
+                .pipe(blob.createWriteStream(options))
+                .on('error', reject)
+                .on('finish', resolve);
+        });
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+        res.status(200).json({ publicUrl });
     });
 }

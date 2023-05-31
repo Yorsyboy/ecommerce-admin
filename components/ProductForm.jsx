@@ -29,19 +29,17 @@ export default function ProductForm({ productInfo }) {
   }
 
   const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-  
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-  
-      await axios.post('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+    const files = event.target.files;
+    if (files?.length > 0) {
+      const data = new FormData();
+      for (const file of files) {
+        data.append("file", file);
+      }
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: data,
       });
-  
-      console.log('Image uploaded successfully!');
-    } catch (error) {
-      console.error('Error occurred during image upload:', error);
+      console.log(res)
     }
   };
   
