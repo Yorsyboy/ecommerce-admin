@@ -27,6 +27,7 @@ export default async function handler(req, res) {
             return;
         }
 
+        const links = [];
         const file = files.file[0];
         const blob = bucket.file(file.originalFilename);
         const stream = fs.createReadStream(file.path);
@@ -41,7 +42,8 @@ export default async function handler(req, res) {
                 .on('error', reject)
                 .on('finish', resolve);
         });
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-        res.status(200).json({ publicUrl });
+        const link = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+        links.push(link);
+        res.status(200).json({ links });
     });
 }
