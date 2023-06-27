@@ -2,19 +2,25 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
-export default function ProductForm({ productInfo }) {
+export default function ProductForm({ 
+  title:existingTitle, 
+  description:existingDescription, 
+  price:existingPrice, 
+  images:existingImages, 
+}) {
   const router = useRouter();
-  const [title, setTitle] = useState(productInfo?.title || "");
+  const [title, setTitle] = useState(existingTitle || "");
   const [description, setDescription] = useState(
-    productInfo?.description || ""
+    existingDescription || ""
   );
-  const [price, setPrice] = useState(productInfo?.price || "");
+  const [price, setPrice] = useState(existingPrice || "");
+  const [images, setImage] = useState(existingImages || []);
   const [goToProducts, setGoToProducts] = useState(false);
 
   const saveProduct = async (e) => {
     e.preventDefault();
-    const data = { title, description, price };
-    if (productInfo._id) {
+    const data = { title, description, price, images };
+    if (productInfo?._id) {
       // update existing product
       await axios.put(`/api/products`, { ...data, _id: productInfo._id });
     } else {
@@ -35,15 +41,13 @@ export default function ProductForm({ productInfo }) {
       for (const file of files) {
         data.append("file", file);
       }
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
+      const res = await axios.post("/api/upload", data);
+      console.log(res.data)
+      setImage(oldImages => {
+        return [...oldImages, ...res.data.links];
       });
-      console.log(res)
     }
   };
-  
-  
 
   return (
     <form onSubmit={saveProduct} encType="multipart/form-data">
@@ -55,7 +59,12 @@ export default function ProductForm({ productInfo }) {
         placeholder="product name"
       />
       <label htmlFor="">Product Image</label>
-      <div className="mb-2">
+      <div className="mb-2 flex flex-wrap gap-2">
+        {!!images?.length && images.map(link => (
+          <div key={link} className="h-24">
+            <img src={link} alt="img" className="rounded-lg"/>
+          </div>
+        ))}
         <label className="w-24 h-24 flex flex-col items-center text-center text-gray-500 justify-center rounded-lg bg-gray-200 cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +90,7 @@ export default function ProductForm({ productInfo }) {
             className="hidden"
           />
         </label>
-        {!productInfo?.image && <div>No images for this Product </div>}
+        {!images && <div>No images for this Product </div>}
       </div>
       <label htmlFor="">Product Description</label>
       <textarea

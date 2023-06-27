@@ -13,7 +13,6 @@ export default function Editproduct() {
     if (!id) return;
 
     axios.get(`/api/products?id=` +id).then((res) => {
-      console.log(res.data);
       setProductInfo(res.data);
     });
 
@@ -22,10 +21,11 @@ export default function Editproduct() {
   return (
     <Layout>
       <h1>Edit Product</h1>
-      {console.log(productInfo)}
-      {productInfo && (
-        <ProductForm productInfo={productInfo} />
-      )}
+      {/* {console.log(productInfo.images)} */}
+      {/* {productInfo && (
+        <ProductForm  />
+      )} */}
+      <ProductForm {...productInfo} />
     </Layout>
   )
 }
