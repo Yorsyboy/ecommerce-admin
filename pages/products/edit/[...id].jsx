@@ -22,10 +22,10 @@ export default function Editproduct() {
     <Layout>
       <h1>Edit Product</h1>
       {/* {console.log(productInfo.images)} */}
-      {/* {productInfo && (
-        <ProductForm  />
-      )} */}
-      <ProductForm {...productInfo} />
+      {productInfo && (
+        <ProductForm {...productInfo} />
+      )}
+      
     </Layout>
   )
 }
