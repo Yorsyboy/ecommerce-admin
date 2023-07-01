@@ -10,13 +10,15 @@ export default function ProductForm({
   description: existingDescription,
   price: existingPrice,
   images: existingImages,
-  category:assignedCategory,
+  category: assignedCategory,
+  properties: assignedProperties,
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(existingTitle || "");
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
   const [category, setCategory] = useState(assignedCategory || "");
+  const [productProperties, setProductProperties] = useState(assignedProperties || {});
   const [images, setImage] = useState(existingImages || []);
   const [goToProducts, setGoToProducts] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -30,7 +32,14 @@ export default function ProductForm({
 
   const saveProduct = async (e) => {
     e.preventDefault();
-    const data = { title, description, price, images, category };
+    const data = {
+      title,
+      description,
+      price,
+      images,
+      category,
+      properties: productProperties,
+    };
     if (_id) {
       // update existing product
       await axios.put(`/api/products`, { ...data, _id });
@@ -66,6 +75,32 @@ export default function ProductForm({
     setImage(images);
   };
 
+  function setProductProp(propName, value) {
+    setProductProperties((prev) => {
+      const newProductProps = { ...prev };
+      newProductProps[propName] = value;
+      return newProductProps;
+    });
+  }
+
+  const propertiesToFill = [];
+  if (categories.length > 0 && category) {
+    // find the selected category
+    let catInfo = categories.find(({ _id }) => _id === category);
+
+    // add the properties of the selected category to the propertiesToFill array
+    propertiesToFill.push(...catInfo.properties);
+
+    // add the properties of the parent categories to the propertiesToFill array
+    // while (catInfo?.parent?._id) {
+    //   const parentCat = categories.find(
+    //     ({ _id }) => _id === catInfo?.parent?._id
+    //   );
+    //   propertiesToFill.push(...parentCat.properties);
+    //   catInfo = parentCat;
+    // }
+  }
+
   return (
     <form onSubmit={saveProduct} encType="multipart/form-data">
       <label>Product Name</label>
@@ -77,7 +112,7 @@ export default function ProductForm({
       />
       <label htmlFor="">Category</label>
       <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="1">Uncategorized</option>
+        <option value="">Uncategorized</option>
         {categories.length > 0 &&
           categories.map((c) => (
             <option key={c._id} value={c._id}>
@@ -85,6 +120,20 @@ export default function ProductForm({
             </option>
           ))}
       </select>
+      {propertiesToFill.length > 0 &&
+        propertiesToFill.map((p) => (
+          <div className="flex gap-1">
+            <div>{p.name}</div>
+            <select
+              value={productProperties[p.name]}
+              onChange={(e) => setProductProp(p.name, e.target.value)}
+            >
+              {p.values.map((v) => (
+                <option value={v}>{v}</option>
+              ))}
+            </select>
+          </div>
+        ))}
 
       <label htmlFor="">Product Image</label>
       <div className="mb-2 flex flex-wrap gap-1">

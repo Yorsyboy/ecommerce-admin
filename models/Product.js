@@ -1,3 +1,4 @@
+import { type } from "express/lib/response";
 import mongoose, { Schema, model, models } from "mongoose";
 
 const ProductSchema = new Schema({
@@ -5,7 +6,8 @@ const ProductSchema = new Schema({
     description: {type: String, require: true},
     price: {type: Number, require: true},
     images: [{type: String}],
-    category: {type:mongoose.Types.ObjectId, ref:'Category'}
+    category: {type:mongoose.Types.ObjectId, ref:'Category'},
+    properties: {type:Object}
 });
 
 export const Product = models.Product || model("Product", ProductSchema);
