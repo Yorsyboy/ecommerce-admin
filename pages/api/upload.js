@@ -1,6 +1,8 @@
 import multiparty from 'multiparty';
 import { Storage } from '@google-cloud/storage';
 import fs from 'fs';
+import { mongooseConnect } from '@/lib/mongoose';
+import { isAdminRequest } from './auth/[...nextauth]';
 
 export const config = {
     api: {
@@ -9,6 +11,9 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+    await mongooseConnect();
+    await isAdminRequest(req, res);
+
     const form = new multiparty.Form();
     const storage = new Storage({
         projectId: process.env.GCLOUD_PROJECT_ID,
