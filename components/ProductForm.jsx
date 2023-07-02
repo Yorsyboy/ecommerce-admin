@@ -18,7 +18,9 @@ export default function ProductForm({
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
   const [category, setCategory] = useState(assignedCategory || "");
-  const [productProperties, setProductProperties] = useState(assignedProperties || {});
+  const [productProperties, setProductProperties] = useState(
+    assignedProperties || {}
+  );
   const [images, setImage] = useState(existingImages || []);
   const [goToProducts, setGoToProducts] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -85,20 +87,29 @@ export default function ProductForm({
 
   const propertiesToFill = [];
   if (categories.length > 0 && category) {
-    // find the selected category
     let catInfo = categories.find(({ _id }) => _id === category);
 
-    // add the properties of the selected category to the propertiesToFill array
-    propertiesToFill.push(...catInfo.properties);
+    if (catInfo?.properties) {
+      // add the properties of the selected category to the propertiesToFill array
+      propertiesToFill.push(...catInfo.properties);
+    }
 
     // add the properties of the parent categories to the propertiesToFill array
-    // while (catInfo?.parent?._id) {
-    //   const parentCat = categories.find(
-    //     ({ _id }) => _id === catInfo?.parent?._id
-    //   );
-    //   propertiesToFill.push(...parentCat.properties);
-    //   catInfo = parentCat;
-    // }
+    while (catInfo?.parent?._id) {
+      const parentCat = categories.find(
+        ({ _id }) => _id === catInfo?.parent?._id
+      );
+
+      if (!parentCat) {
+        break; // Stop the loop if a parent category is not found
+      }
+
+      if (parentCat.properties) {
+        propertiesToFill.push(...parentCat.properties);
+      }
+
+      catInfo = parentCat;
+    }
   }
 
   return (
@@ -122,8 +133,8 @@ export default function ProductForm({
       </select>
       {propertiesToFill.length > 0 &&
         propertiesToFill.map((p) => (
-          <div className="flex gap-1">
-            <div>{p.name}</div>
+          <div className="">
+            <label>{p.name[0].toUpperCase() + p.name.substring(1)}</label>
             <select
               value={productProperties[p.name]}
               onChange={(e) => setProductProp(p.name, e.target.value)}
@@ -144,7 +155,10 @@ export default function ProductForm({
         >
           {!!images?.length &&
             images.map((link) => (
-              <div key={link} className="h-24">
+              <div
+                key={link}
+                className="h-24 bg-white p-4 shadow-sm rounded-sm border border-gray-200"
+              >
                 <img src={link} alt="img" className="rounded-lg" />
               </div>
             ))}
@@ -154,7 +168,7 @@ export default function ProductForm({
             <Spinner />
           </div>
         )}
-        <label className="w-24 h-24 flex flex-col items-center text-center text-gray-500 justify-center rounded-lg bg-gray-200 cursor-pointer">
+        <label className="w-24 h-24 flex flex-col items-center text-center text-primary justify-center rounded-sm bg-white shadow-md border border-gray-200 cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -169,7 +183,7 @@ export default function ProductForm({
               d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
             />
           </svg>
-          <div>Upload Image</div>
+          <div>Add Image</div>
           <input
             type="file"
             id="imageUpload"
